@@ -3,19 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>quote-generator</title>
+    <title>Quote Generator</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="quote-box">
       <h2>Quote of the day</h2>
-      <blockquote>Loading...</blockquote>
-      <span>Loading...</span>
+      <blockquote id="quote">Loading...</blockquote>
+      <span id="author">Loading...</span>
       <div>
-        <button>New Quote</button>
-
-        <button><img src="images/twiter.png" />Tweet</button>
+        <button onclick="newQuote()">New Quote</button>
+        <button id="tweet-quote" onclick="tweet()">
+          <img src="images/twiter.png" alt="Tweet" /> Tweet
+        </button>
       </div>
     </div>
+    <script>
+      async function getQuote() {
+        const proxyUrl = "https://api.allorigins.win/raw?url=";
+        const apiUrl = "https://zenquotes.io/api/random";
+        const fullUrl = `${proxyUrl}${encodeURIComponent(
+          apiUrl
+        )}?t=${new Date().getTime()}`;
+
+        const response = await fetch(fullUrl);
+        const data = await response.json();
+        return data[0]; // ZenQuotes returns an array with one quote object
+      }
+
+      async function newQuote() {
+        const data = await getQuote();
+        document.getElementById("quote").innerText = data.q;
+        document.getElementById("author").innerText = `${data.a}`;
+      }
+
+      // Fetch a new quote when the page loads
+      newQuote();
+      function tweet() {
+        window.open(
+          "https://twitter.com/intent/tweet?text=" +
+            document.getElementById("quote").innerText +
+            "----by" +
+            document.getElementById("author").innerText,
+          "Tweet Window",
+          "width=600, height=300"
+        );
+      }
+    </script>
   </body>
 </html>
